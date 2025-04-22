@@ -1,0 +1,6 @@
+kokoro
+soundfile
+torch
+librosa
+flask
+numpy

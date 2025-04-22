@@ -1,0 +1,13 @@
+fastapi
+uvicorn
+httpx
+python-dotenv
+pydantic
+elevenlabs
+pyht
+loguru
+starlette
+gradio_client==1.0.1
+numpy
+soundfile
+httpx

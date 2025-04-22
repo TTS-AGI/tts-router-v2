@@ -1,0 +1,123 @@
+<!-- templates/index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voice Cloning Demo</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        textarea {
+            width: 100%;
+            height: 100px;
+            padding: 10px;
+            margin-top: 5px;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+        .error {
+            color: red;
+            display: none;
+        }
+        .loading {
+            display: none;
+        }
+        audio {
+            width: 100%;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Voice Cloning Demo</h1>
+        <div>
+            <label for="text">Text to synthesize:</label>
+            <textarea id="text">Welcome to the voice cloning demo. This text will be spoken in the reference voice.</textarea>
+        </div>
+        <div>
+            <label for="seed">Random Seed:</label>
+            <input type="number" id="seed" value="42">
+        </div>
+        <button id="generate">Generate Speech</button>
+        <div class="loading">Generating audio...</div>
+        <div class="error">An error occurred during generation.</div>
+        <audio id="audio-output" controls></audio>
+    </div>
+
+    <script>
+        const generateBtn = document.getElementById('generate');
+        const textInput = document.getElementById('text');
+        const seedInput = document.getElementById('seed');
+        const audioOutput = document.getElementById('audio-output');
+        const loadingDiv = document.querySelector('.loading');
+        const errorDiv = document.querySelector('.error');
+
+        generateBtn.addEventListener('click', async () => {
+            try {
+                // Reset UI state
+                errorDiv.style.display = 'none';
+                generateBtn.disabled = true;
+                loadingDiv.style.display = 'block';
+                audioOutput.style.display = 'none';
+
+                // Prepare request data
+                const data = {
+                    text: textInput.value,
+                    seed: parseInt(seedInput.value)
+                };
+
+                // Send request to backend
+                const response = await fetch('/generate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to generate audio');
+                }
+
+                // Get the audio blob and create URL
+                const audioBlob = await response.blob();
+                const audioUrl = URL.createObjectURL(audioBlob);
+
+                // Update audio player
+                audioOutput.src = audioUrl;
+                audioOutput.style.display = 'block';
+                audioOutput.play();
+
+            } catch (error) {
+                console.error('Error:', error);
+                errorDiv.style.display = 'block';
+                errorDiv.textContent = error.message;
+            } finally {
+                generateBtn.disabled = false;
+                loadingDiv.style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>
