@@ -90,6 +90,16 @@ try:
 except Exception as e:
     logger.error(f"Failed to load Spark-TTS provider: {str(e)}")
 
+try:
+    from . import megatts3
+except Exception as e:
+    logger.error(f"Failed to load MegaTTS3 provider: {str(e)}")
+
+try:
+    from . import minimax
+except Exception as e:
+    logger.error(f"Failed to load Minimax provider: {str(e)}")
+
 # Initialize providers
 for name, provider_class in list(_PROVIDERS.items()):
     try:

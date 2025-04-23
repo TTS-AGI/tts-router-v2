@@ -57,16 +57,13 @@ class SparkProvider(TTSProvider):
             logger.info(f"No model specified for Spark TTS, using default: {model_id}")
 
         # Use a default reference audio if none provided
-        reference_audio_url = (
-            reference_audio
-            or random.choice(
-                [
-                    "https://files.mrfake.name/api/file/files/nanospeech-voices/celeste.wav",
-                    "https://files.mrfake.name/api/file/files/nanospeech-voices/nash.wav",
-                    "https://files.mrfake.name/api/file/files/nanospeech-voices/orion.wav",
-                    "https://files.mrfake.name/api/file/files/nanospeech-voices/rhea.wav",
-                ]
-            )
+        reference_audio_url = reference_audio or random.choice(
+            [
+                "https://files.mrfake.name/api/file/files/nanospeech-voices/celeste.wav",
+                "https://files.mrfake.name/api/file/files/nanospeech-voices/nash.wav",
+                "https://files.mrfake.name/api/file/files/nanospeech-voices/orion.wav",
+                "https://files.mrfake.name/api/file/files/nanospeech-voices/rhea.wav",
+            ]
         )
 
         try:
@@ -79,21 +76,21 @@ class SparkProvider(TTSProvider):
                     prompt_text="",
                     prompt_wav_upload=handle_file(reference_audio_url),
                     prompt_wav_record=None,
-                    api_name="/voice_clone"
-                )
+                    api_name="/voice_clone",
+                ),
             )
-            
+
             logger.info(f"Spark TTS synthesis result: {result}")
-            
+
             if not result:
                 raise Exception("No result returned from Spark TTS API")
-                
+
             # The result should be the path to the generated audio file
             audio_path = result
-            
+
             with open(audio_path, "rb") as f:
                 audio_data = base64.b64encode(f.read()).decode("ascii")
-                
+
             return audio_data, "wav"
 
         except Exception as e:

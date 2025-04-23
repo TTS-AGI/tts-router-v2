@@ -7,7 +7,7 @@ elevenlabs
 pyht
 loguru
 starlette
-gradio_client==1.0.1
+gradio_client
 numpy
 soundfile
 httpx
