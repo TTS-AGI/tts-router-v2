@@ -14,23 +14,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 MINIMAX_VOICES = [
-    "Wise_Woman",
-    "Friendly_Person",
-    "Inspirational_girl",
-    "Deep_Voice_Man",
-    "Calm_Woman",
-    "Casual_Guy",
-    "Lively_Girl",
-    "Patient_Man",
-    "Young_Knight",
-    "Determined_Man",
-    "Lovely_Girl",
-    "Decent_Boy",
-    "Imposing_Manner",
-    "Elegant_Man",
-    "Abbess",
-    "Sweet_Girl_2",
-    "Exuberant_Girl",
+    "English_Sweet_Female_4"
 ]
 
 
