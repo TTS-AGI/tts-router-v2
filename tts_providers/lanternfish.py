@@ -73,7 +73,7 @@ class LanternfishProvider(TTSProvider):
             return audio_data, "mp3"
 
         except httpx.HTTPStatusError as e:
-            logger.error(f"HTTP error in Lanternfish TTS synthesis: {str(e)}")
+            logger.error(f"HTTP error in Lanternfish TTS synthesis: {str(e)}, content: {e.response.text}")
             raise Exception(f"Lanternfish TTS synthesis error: HTTP error {e.response.status_code}")
         
         except Exception as e:
