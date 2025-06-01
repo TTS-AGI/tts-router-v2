@@ -100,6 +100,11 @@ try:
 except Exception as e:
     logger.error(f"Failed to load Minimax provider: {str(e)}")
 
+try:
+    from . import lanternfish
+except Exception as e:
+    logger.error(f"Failed to load Lanternfish provider: {str(e)}")
+
 # Initialize providers
 for name, provider_class in list(_PROVIDERS.items()):
     try:
