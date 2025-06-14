@@ -36,29 +36,49 @@ class AudioProcessor:
                 output_path = output_file.name
             
             try:
-                # Process audio with ffmpeg
-                stream = ffmpeg.input(input_path)
+                # Create intermediate raw audio file to completely strip all metadata
+                with tempfile.NamedTemporaryFile(delete=False, suffix='.raw') as raw_file:
+                    raw_path = raw_file.name
                 
-                # Apply processing pipeline:
-                # - Convert to MP3 with consistent settings
-                # - Resample to 44kHz
-                # - Remove all metadata
-                # - Use consistent bitrate and encoding
-                stream = ffmpeg.output(
-                    stream,
-                    output_path,
-                    acodec='mp3',           # Force MP3 codec
-                    ar=44100,               # Resample to 44kHz
-                    ab='128k',              # Consistent bitrate
-                    ac=1,                   # Convert to mono to reduce identifying characteristics
-                    map_metadata=-1,        # Remove all metadata
-                    fflags='+bitexact',     # Ensure reproducible output
-                    avoid_negative_ts='make_zero',  # Normalize timestamps
-                    f='mp3'                 # Force MP3 format
-                )
-                
-                # Run the conversion
-                ffmpeg.run(stream, overwrite_output=True, quiet=True)
+                try:
+                    # Step 1: Convert to raw PCM to strip all metadata and container info
+                    stream1 = ffmpeg.input(input_path)
+                    stream1 = ffmpeg.output(
+                        stream1,
+                        raw_path,
+                        acodec='pcm_s16le',     # Raw PCM 16-bit little endian
+                        ar=44100,               # Resample to 44kHz
+                        ac=1,                   # Convert to mono
+                        f='s16le'               # Raw format
+                    )
+                    ffmpeg.run(stream1, overwrite_output=True, quiet=True)
+                    
+                    # Step 2: Convert raw PCM back to MP3 with no metadata
+                    stream2 = ffmpeg.input(raw_path, f='s16le', ar=44100, ac=1)
+                    stream2 = ffmpeg.output(
+                        stream2,
+                        output_path,
+                        acodec='libmp3lame',    # Use libmp3lame for better control
+                        ar=44100,               # Keep 44kHz
+                        ab='128k',              # Consistent bitrate
+                        ac=1,                   # Keep mono
+                        map_metadata=-1,        # Remove all metadata
+                        id3v2_version=0,        # Disable ID3v2 tags completely
+                        write_id3v1=0,          # Disable ID3v1 tags
+                        write_apetag=0,         # Disable APE tags
+                        fflags='+bitexact',     # Ensure reproducible output
+                        f='mp3'                 # Force MP3 format
+                    )
+                    
+                    # Run the conversion
+                    ffmpeg.run(stream2, overwrite_output=True, quiet=True)
+                    
+                finally:
+                    # Clean up intermediate raw file
+                    try:
+                        os.unlink(raw_path)
+                    except OSError:
+                        pass
                 
                 # Read the processed audio
                 with open(output_path, 'rb') as f:
