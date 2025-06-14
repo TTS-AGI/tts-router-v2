@@ -66,6 +66,7 @@ class AudioProcessor:
                         id3v2_version=0,        # Disable ID3v2 tags completely
                         write_id3v1=0,          # Disable ID3v1 tags
                         write_apetag=0,         # Disable APE tags
+                        write_xing=0,           # Disable Xing header
                         fflags='+bitexact',     # Ensure reproducible output
                         f='mp3'                 # Force MP3 format
                     )
@@ -83,6 +84,9 @@ class AudioProcessor:
                 # Read the processed audio
                 with open(output_path, 'rb') as f:
                     processed_audio = f.read()
+                
+                # Post-process to remove any remaining encoder signatures
+                processed_audio = AudioProcessor._remove_encoder_signatures(processed_audio)
                 
                 # Base64 encode for transport
                 encoded_audio = base64.b64encode(processed_audio).decode('ascii')
@@ -104,6 +108,42 @@ class AudioProcessor:
             # Fallback: return original audio as base64 if processing fails
             fallback_audio = base64.b64encode(audio_data).decode('ascii')
             return fallback_audio, input_format or "mp3"
+    
+    @staticmethod
+    def _remove_encoder_signatures(audio_data: bytes) -> bytes:
+        """
+        Remove encoder signatures and identifying strings from audio data
+        
+        Args:
+            audio_data: Raw audio bytes
+            
+        Returns:
+            Audio bytes with signatures removed
+        """
+        # List of encoder signatures to remove
+        signatures_to_remove = [
+            b'Lavf',           # libavformat
+            b'LAME',           # LAME encoder
+            b'Xing',           # Xing header
+            b'Info',           # Info header
+            b'VBRI',           # VBRI header
+            b'TSSE',           # Software encoder tag
+            b'TXXX',           # User-defined text
+            b'aigc',           # AI-generated content markers
+            b'HUABABSpeech',   # Specific TTS signatures
+            b'ContentProducer', # Content producer tags
+            b'ProduceID',      # Producer ID tags
+        ]
+        
+        # Replace signatures with null bytes of same length
+        cleaned_audio = audio_data
+        for signature in signatures_to_remove:
+            if signature in cleaned_audio:
+                # Replace with null bytes to maintain file structure
+                cleaned_audio = cleaned_audio.replace(signature, b'\x00' * len(signature))
+                logger.info(f"Removed encoder signature: {signature.decode('utf-8', errors='ignore')}")
+        
+        return cleaned_audio
     
     @staticmethod
     def process_base64_audio(base64_audio: str, input_format: str = None) -> Tuple[str, str]:
