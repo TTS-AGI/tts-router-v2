@@ -36,7 +36,7 @@ class TTSProvider(ABC):
 
     @classmethod
     @abstractmethod
-    async def synthesize(cls, text: str, model_id: str = None) -> Tuple[bytes, str]:
+    async def synthesize(cls, text: str, model_id: str = None) -> Tuple[str, str]:
         """
         Synthesize speech using the specified model
 
@@ -45,6 +45,6 @@ class TTSProvider(ABC):
             model_id: The ID of the model to use. If None, use the default model.
 
         Returns:
-            A tuple of (audio_data, extension)
+            A tuple of (base64_encoded_audio_data, extension)
         """
         pass

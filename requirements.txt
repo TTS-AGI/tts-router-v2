@@ -11,3 +11,4 @@ gradio_client
 numpy
 soundfile
 httpx
+ffmpeg-python
