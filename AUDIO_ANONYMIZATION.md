@@ -10,29 +10,23 @@ This TTS router includes comprehensive audio anonymization to make it harder to 
 - **Mono conversion**: Convert to single channel to reduce identifying characteristics
 - **Consistent bitrate**: All audio encoded at 128kbps
 
-### 2. Metadata Removal
-- **Complete metadata stripping**: Remove all ID3v1, ID3v2, and APE tags
-- **Encoder signature removal**: Strip encoder identifiers like "LAME", "Lavf"
-- **TTS signature removal**: Remove AI-generated content markers and TTS-specific metadata
-- **Header normalization**: Remove Xing/Info headers that may contain identifying information
+### 2. Complete Audio Reconstruction
+- **Raw PCM extraction**: Convert to raw PCM samples, completely stripping all container metadata and headers
+- **Clean MP3 reconstruction**: Re-encode from raw samples with minimal, standardized headers
+- **Two-stage processing**: Streamlined pipeline for maximum compatibility and effectiveness
 
-### 3. Processing Pipeline
-The audio processing uses a two-step approach:
-1. **Raw PCM conversion**: Convert to raw PCM format to completely strip container metadata
-2. **Clean MP3 encoding**: Re-encode to MP3 with strict metadata controls
+### 3. Deep Binary-Level Cleaning
+- **MP3 structure analysis**: Analyzes MP3 file structure to identify audio frames vs metadata
+- **Automatic text detection**: Detects and neutralizes suspicious text sequences (4+ consecutive printable characters)
+- **Metadata header removal**: Identifies and removes binary signatures that could indicate metadata headers
+- **Comprehensive sanitization**: Neutralizes any non-audio data while preserving MP3 frame integrity
 
-### 4. Signatures Removed
-The system automatically removes these identifying signatures:
-- `Lavf` - libavformat signatures
-- `LAME` - LAME encoder signatures  
-- `TSSE` - Software encoder tags
-- `TXXX` - User-defined text metadata
-- `aigc` - AI-generated content markers
-- `HUABABSpeech` - Specific TTS provider signatures
-- `ContentProducer` - Content producer identification
-- `ProduceID` - Producer ID tags
-- `Xing`/`Info` - MP3 header information
-- `VBRI` - Variable bitrate information
+### 4. Generalized Approach
+Instead of relying on specific signature lists, the system uses intelligent detection:
+- **Text pattern analysis**: Automatically identifies and removes text-like sequences
+- **Binary signature detection**: Recognizes metadata headers by structure rather than specific strings
+- **Container-agnostic processing**: Works regardless of the original audio format or embedded metadata
+- **Future-proof**: Effective against new or unknown identifying markers
 
 ## Implementation Details
 
@@ -41,7 +35,7 @@ Located in `tts_providers/audio_processor.py`, this class handles all audio anon
 
 - `process_audio()` - Main processing function for raw audio bytes
 - `process_base64_audio()` - Wrapper for base64-encoded audio (used by TTS providers)
-- `_remove_encoder_signatures()` - Post-processing to remove remaining signatures
+- `_deep_clean_binary()` - Advanced binary-level cleaning that analyzes MP3 structure and removes identifying data
 
 ### Integration
 The audio processor is automatically applied to all TTS provider outputs through the `synthesize_speech()` function in `tts_providers/base.py`.
