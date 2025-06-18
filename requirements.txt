@@ -12,3 +12,4 @@ numpy
 soundfile
 httpx
 ffmpeg-python
+pydub
