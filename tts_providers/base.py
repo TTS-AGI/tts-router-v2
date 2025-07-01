@@ -116,6 +116,11 @@ try:
 except Exception as e:
     logger.error(f"Failed to load Lanternfish provider: {str(e)}")
 
+try:
+    from . import asyncai
+except Exception as e:
+    logger.error(f"Failed to load AsyncAI provider: {str(e)}")
+
 # Initialize providers
 for name, provider_class in list(_PROVIDERS.items()):
     try:
