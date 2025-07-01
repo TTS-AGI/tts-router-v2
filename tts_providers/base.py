@@ -50,7 +50,7 @@ async def synthesize_speech(
 # Try to load all provider modules
 def _try_import(module_name: str, pretty_name: str):
     try:
-        __import__(f".{module_name}", globals(), locals(), level=1)
+        __import__(f"tts_providers.{module_name}")
     except Exception as e:
         logger.error(f"Failed to load {pretty_name} provider: {str(e)}")
 
