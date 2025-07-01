@@ -44,7 +44,7 @@ class AsyncProvider(TTSProvider):
     def get_available_models(cls) -> List[Dict[str, Any]]:
         """Get a list of available models for async"""
         if not cls.is_available() or not cls._models:
-            return ["octave"]
+            return ["async"]
 
         return cls._models
 
