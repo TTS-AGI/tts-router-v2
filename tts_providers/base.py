@@ -1,8 +1,5 @@
 from loguru import logger
-import importlib
-import inspect
 from typing import Dict, List, Tuple, Any
-from .audio_processor import AudioProcessor
 
 # Registry to store provider implementations
 _PROVIDERS = {}
@@ -36,90 +33,46 @@ def get_provider_models(provider_name: str) -> List[Dict[str, Any]]:
 async def synthesize_speech(
     text: str, provider_name: str, model_id: str = None
 ) -> Tuple[str, str]:
-    """Synthesize speech using the specified provider and model, with audio anonymization"""
+    """Synthesize speech using the specified provider and model"""
     provider_name = provider_name.lower()
     if provider_name not in _PROVIDERS:
         raise ValueError(f"Provider '{provider_name}' not found or not available")
 
     provider = _PROVIDERS[provider_name]
-    
+
     # Get raw audio from provider
     raw_audio_data, original_extension = await provider.synthesize(text, model_id)
-    
-    # Process audio for anonymization (convert to MP3, remove metadata, resample to 44kHz)
-    logger.info(f"Processing audio from {provider_name} for anonymization")
-    processed_audio, processed_extension = AudioProcessor.process_base64_audio(
-        raw_audio_data, original_extension
-    )
-    
-    return processed_audio, processed_extension
+
+    # No post-processing — just raw output
+    return raw_audio_data, original_extension
 
 
 # Try to load all provider modules
-try:
-    from . import elevenlabs
-except Exception as e:
-    logger.error(f"Failed to load ElevenLabs provider: {str(e)}")
+def _try_import(module_name: str, pretty_name: str):
+    try:
+        __import__(f".{module_name}", globals(), locals(), level=1)
+    except Exception as e:
+        logger.error(f"Failed to load {pretty_name} provider: {str(e)}")
 
-try:
-    from . import playht
-except Exception as e:
-    logger.error(f"Failed to load PlayHT provider: {str(e)}")
 
-try:
-    from . import cosyvoice
-except Exception as e:
-    logger.error(f"Failed to load CosyVoice provider: {str(e)}")
+_provider_modules = [
+    ("elevenlabs", "ElevenLabs"),
+    ("playht", "PlayHT"),
+    ("cosyvoice", "CosyVoice"),
+    ("styletts", "StyleTTS"),
+    ("hume", "Hume"),
+    ("papla", "Papla"),
+    ("kokoro", "Kokoro"),
+    ("cartesia", "Cartesia"),
+    ("spark", "Spark-TTS"),
+    ("megatts3", "MegaTTS3"),
+    ("minimax", "Minimax"),
+    ("lanternfish", "Lanternfish"),
+    ("asyncai", "AsyncAI"),
+]
 
-try:
-    from . import styletts
-except Exception as e:
-    logger.error(f"Failed to load StyleTTS provider: {str(e)}")
-
-try:
-    from . import hume
-except Exception as e:
-    logger.error(f"Failed to load Hume provider: {str(e)}")
-
-try:
-    from . import papla
-except Exception as e:
-    logger.error(f"Failed to load Papla provider: {str(e)}")
-
-try:
-    from . import kokoro
-except Exception as e:
-    logger.error(f"Failed to load Kokoro provider: {str(e)}")
-
-try:
-    from . import cartesia
-except Exception as e:
-    logger.error(f"Failed to load Cartesia provider: {str(e)}")
-
-try:
-    from . import spark
-except Exception as e:
-    logger.error(f"Failed to load Spark-TTS provider: {str(e)}")
-
-try:
-    from . import megatts3
-except Exception as e:
-    logger.error(f"Failed to load MegaTTS3 provider: {str(e)}")
-
-try:
-    from . import minimax
-except Exception as e:
-    logger.error(f"Failed to load Minimax provider: {str(e)}")
-
-try:
-    from . import lanternfish
-except Exception as e:
-    logger.error(f"Failed to load Lanternfish provider: {str(e)}")
-
-try:
-    from . import asyncai
-except Exception as e:
-    logger.error(f"Failed to load AsyncAI provider: {str(e)}")
+for module_name, pretty_name in _provider_modules:
+    _try_import(module_name, pretty_name)
 
 # Initialize providers
 for name, provider_class in list(_PROVIDERS.items()):
@@ -128,5 +81,4 @@ for name, provider_class in list(_PROVIDERS.items()):
         logger.info(f"Successfully initialized provider: {name}")
     except Exception as e:
         logger.error(f"Failed to initialize provider {name}: {str(e)}")
-        # Do not remove the provider from registry, just mark it as unavailable
-        # This allows us to report the provider as unavailable rather than missing
+        # Keep the provider in registry but mark it as unavailable
