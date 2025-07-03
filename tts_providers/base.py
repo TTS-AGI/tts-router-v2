@@ -69,6 +69,7 @@ _provider_modules = [
     ("minimax", "Minimax"),
     ("lanternfish", "Lanternfish"),
     ("asyncai", "AsyncAI"),
+    ("nls", "NLS"),
 ]
 
 for module_name, pretty_name in _provider_modules:
