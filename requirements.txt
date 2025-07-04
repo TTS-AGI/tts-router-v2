@@ -10,6 +10,6 @@ starlette
 gradio_client
 numpy
 soundfile
-httpx
+httpx[http2]
 ffmpeg-python
 pydub
