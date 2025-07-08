@@ -78,11 +78,18 @@ class ChatterboxProvider(TTSProvider):
                     timeout=30,
                 )
             response.raise_for_status()
-            audio_data = base64.b64encode(response.content).decode("ascii")
+            
+            # Parse JSON response to get audio_content
+            response_data = response.json()
+            if "audio_content" not in response_data:
+                raise Exception("No audio_content in response")
+            
+            # The audio_content is already base64 encoded, so just return it
+            audio_data = response_data["audio_content"]
             return audio_data, "wav"
         except httpx.HTTPStatusError as e:
             logger.error(f"HTTP error in Chatterbox TTS synthesis: {str(e)}, content: {e.response.text}")
             raise Exception(f"Chatterbox TTS synthesis error: HTTP error {e.response.status_code}")
         except Exception as e:
             logger.error(f"Error in Chatterbox TTS synthesis: {str(e)}")
-            raise Exception(f"Chatterbox TTS synthesis error: {str(e)}") 
+            raise Exception(f"Chatterbox TTS synthesis error: {str(e)}")
