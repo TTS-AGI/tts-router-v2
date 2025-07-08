@@ -1,6 +1,7 @@
 import os
 import base64
 import httpx
+import random
 from loguru import logger
 from typing import Dict, List, Tuple, Any
 from .provider import TTSProvider
@@ -9,7 +10,7 @@ from .base import register_provider
 
 @register_provider("chatterbox")
 class ChatterboxProvider(TTSProvider):
-    _models = [
+    _voices = [
         {
             "id": "voice1-male",
             "name": "Voice 1 (Male)",
@@ -44,18 +45,16 @@ class ChatterboxProvider(TTSProvider):
 
     @classmethod
     def get_available_models(cls) -> List[Dict[str, Any]]:
-        return cls._models
+        # For compatibility, return voices as "models"
+        return cls._voices
 
     @classmethod
     async def synthesize(
         cls, text: str, model_id: str = None
     ) -> Tuple[str, str]:
-        if not model_id:
-            model_id = "voice1-male"
-        model = next((m for m in cls._models if m["id"] == model_id), None)
-        if not model:
-            raise ValueError(f"Model {model_id} not found for Chatterbox provider.")
-        voice_uuid = model["voice_uuid"]
+        # Autocycle/randomly select a voice for each generation, ignore model_id
+        voice = random.choice(cls._voices)
+        voice_uuid = voice["voice_uuid"]
         # Wrap text in SSML if not already
         if not text.strip().startswith("<speak"):
             ssml = f'<speak exaggeration="0.6">{text}</speak>'
