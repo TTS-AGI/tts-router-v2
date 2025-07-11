@@ -71,6 +71,7 @@ _provider_modules = [
     ("asyncai", "AsyncAI"),
     ("nls", "NLS"),
     ("chatterbox", "Chatterbox"),
+    ("inworld", "Inworld"),
 ]
 
 for module_name, pretty_name in _provider_modules:
