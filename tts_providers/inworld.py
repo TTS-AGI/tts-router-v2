@@ -124,8 +124,13 @@ class InworldProvider(TTSProvider):
                 )
             response.raise_for_status()
             
-            # The response should contain audio data
-            audio_data = base64.b64encode(response.content).decode("ascii")
+            # Parse JSON response to get audioContent
+            response_data = response.json()
+            if "audioContent" not in response_data:
+                raise Exception("No audioContent in response")
+            
+            # The audioContent is already base64 encoded, so just return it
+            audio_data = response_data["audioContent"]
             return audio_data, "wav"
 
         except httpx.HTTPStatusError as e:
