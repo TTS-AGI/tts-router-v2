@@ -1,5 +1,6 @@
 import os
 import base64
+import random
 import httpx
 from loguru import logger
 from typing import Dict, List, Tuple, Any
@@ -58,14 +59,12 @@ class WordcabProvider(TTSProvider):
         if not cls.is_available():
             raise ValueError("Wordcab TTS provider is not available")
 
-        # Default to first voice if no model specified
+        # Choose random voice if no model specified, otherwise accept any model
         if not model_id:
-            model_id = cls._voices[0]
-            logger.info(f"No model specified for Wordcab TTS, using default: {model_id}")
-
-        # Validate model_id is a known voice
-        if model_id not in cls._voices:
-            raise ValueError(f"Unknown Wordcab voice: {model_id}. Available voices: {cls._voices}")
+            model_id = random.choice(cls._voices)
+            logger.info(f"No model specified for Wordcab TTS, using random voice: {model_id}")
+        else:
+            logger.info(f"Using specified model for Wordcab TTS: {model_id}")
 
         try:
             # Get API URL, default to the reference URL if not set
