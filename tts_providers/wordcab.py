@@ -17,13 +17,8 @@ class WordcabProvider(TTSProvider):
         "zhanna_call_sample_28s",
         "sheena_youtube_sample_18s", 
         "kesley_zoom_sample_36s",
-        "dave_phone_sample_20s",
         "derick_clip_001_15s_001",
         "chris_clip_001_15s_001",
-        "swedish_accent",
-        "jane_25s",
-        "classic_audiobook",
-        "llama_obama"
     ]
 
     @classmethod
