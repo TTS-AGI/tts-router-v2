@@ -70,7 +70,7 @@ class WordcabProvider(TTSProvider):
                 response = await client.post(
                     endpoint,
                     json={
-                        "input": text + " ,,,",
+                        "input": text,
                         "voice": model_id,
                     },
                     headers={
