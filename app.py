@@ -4,6 +4,12 @@ import uvicorn
 from loguru import logger
 import os
 from dotenv import load_dotenv
+import base64
+import io
+from typing import Tuple
+
+from pydub import AudioSegment
+from pydub import effects as audio_effects
 
 # Import TTS providers
 from tts_providers import (
@@ -63,6 +69,13 @@ async def tts(request: TTSRequest):
 
         audio_data, extension = await synthesize_speech(text, provider, model)
 
+        # Normalize audio volume to reduce bias between providers
+        try:
+            audio_data = _normalize_base64_audio(audio_data, extension)
+            logger.info("Applied peak normalization to output audio")
+        except Exception as norm_err:
+            logger.warning(f"Audio normalization failed, returning original audio: {norm_err}")
+
         logger.info(
             f"TTS request completed successfully - Provider: {provider}, Model: {model}"
         )
@@ -82,3 +95,29 @@ async def tts(request: TTSRequest):
 
 if __name__ == "__main__":
     uvicorn.run("app:app", host="0.0.0.0", port=8000, reload=True)
+
+
+def _normalize_base64_audio(b64_audio: str, extension: str) -> str:
+    """Quick peak normalization on base64 audio while preserving format.
+
+    - Decodes base64 -> AudioSegment
+    - Applies fast peak normalization with small headroom
+    - Re-encodes to original format and returns base64
+    """
+    raw = base64.b64decode(b64_audio)
+    buf = io.BytesIO(raw)
+
+    # Map some extensions to ffmpeg format names if needed
+    fmt = (extension or "mp3").lower()
+    fmt_map = {"m4a": "mp4"}
+    load_fmt = fmt_map.get(fmt, fmt)
+
+    audio = AudioSegment.from_file(buf, format=load_fmt)
+
+    # Fast peak normalization with 1 dB headroom to avoid clipping
+    normalized = audio_effects.normalize(audio, headroom=1.0)
+
+    out = io.BytesIO()
+    export_fmt = fmt
+    normalized.export(out, format=export_fmt)
+    return base64.b64encode(out.getvalue()).decode("ascii")
