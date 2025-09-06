@@ -9,70 +9,22 @@ from .base import register_provider
 
 @register_provider("inworld")
 class InworldProvider(TTSProvider):
+    # Inworld voices (speakers) exposed in the arena UI
     _models = [
-        {
-            "id": "mark",
-            "name": "Mark",
-            "voiceId": "Mark",
-            "gender": "male",
-        },
-        {
-            "id": "ashley",
-            "name": "Ashley",
-            "voiceId": "Ashley",
-            "gender": "female",
-        },
-        {
-            "id": "alex",
-            "name": "Alex",
-            "voiceId": "Alex",
-            "gender": "male",
-        },
-        {
-            "id": "theodore",
-            "name": "Theodore",
-            "voiceId": "Theodore",
-            "gender": "male",
-        },
-        {
-            "id": "deborah",
-            "name": "Deborah",
-            "voiceId": "Deborah",
-            "gender": "female",
-        },
-        {
-            "id": "sarah",
-            "name": "Sarah",
-            "voiceId": "Sarah",
-            "gender": "female",
-        },
-        {
-            "id": "edward",
-            "name": "Edward",
-            "voiceId": "Edward",
-            "gender": "male",
-        },
-        {
-            "id": "olivia",
-            "name": "Olivia",
-            "voiceId": "Olivia",
-            "gender": "female",
-        },
-        {
-            "id": "hades",
-            "name": "Hades",
-            "voiceId": "Hades",
-            "gender": "male",
-        },
-        {
-            "id": "elizabeth",
-            "name": "Elizabeth",
-            "voiceId": "Elizabeth",
-            "gender": "female",
-        },
+        {"id": "alex", "name": "Alex", "voiceId": "Alex", "gender": "male"},
+        {"id": "olivia", "name": "Olivia", "voiceId": "Olivia", "gender": "female"},
+        {"id": "mark", "name": "Mark", "voiceId": "Mark", "gender": "male"},
+        {"id": "ashley", "name": "Ashley", "voiceId": "Ashley", "gender": "female"},
+        {"id": "deborah", "name": "Deborah", "voiceId": "Deborah", "gender": "female"},
+        {"id": "ronald", "name": "Ronald", "voiceId": "Ronald", "gender": "male"},
+        {"id": "dennis", "name": "Dennis", "voiceId": "Dennis", "gender": "male"},
+        {"id": "theodore", "name": "Theodore", "voiceId": "Theodore", "gender": "male"},
+        {"id": "wendy", "name": "Wendy", "voiceId": "Wendy", "gender": "female"},
+        {"id": "craig", "name": "Craig", "voiceId": "Craig", "gender": "male"},
     ]
     _api_url = "https://api.inworld.ai/tts/v1/voice"
     _api_key = os.getenv("INWORLD_API_KEY")
+    # Default engine model; can be overridden per-request via model_id
     _model_id = "inworld-tts-1"
 
     @classmethod
@@ -99,15 +51,33 @@ class InworldProvider(TTSProvider):
         if not cls.is_available():
             raise ValueError("Inworld TTS provider is not available")
 
-        # Autocycle/randomly select a voice for each generation, ignore model_id
+        # Determine voice and engine model for this request
         import random
-        voice = random.choice(cls._models)
-        voice_id = voice["voiceId"]
+
+        # Map lowercase id -> voice entry for quick lookup
+        voice_map = {v["id"].lower(): v for v in cls._models}
+
+        # Default to random voice
+        selected_voice = random.choice(cls._models)
+        selected_voice_id = selected_voice["voiceId"]
+
+        # Engine model selection: allow either default or MAX when explicitly requested
+        engine_model_id = cls._model_id
+
+        if model_id:
+            mid = str(model_id).strip()
+
+            # If the provided model_id is an engine selector, use it
+            if mid in {"inworld-tts-1", "inworld-tts-1-max"}:
+                engine_model_id = mid
+            # Otherwise, if it matches a known voice id, select that voice explicitly
+            elif mid.lower() in voice_map:
+                selected_voice_id = voice_map[mid.lower()]["voiceId"]
 
         payload = {
             "text": text,
-            "voiceId": voice_id,
-            "modelId": cls._model_id,
+            "voiceId": selected_voice_id,
+            "modelId": engine_model_id,
         }
         headers = {
             "Authorization": f"Basic {cls._api_key}",
