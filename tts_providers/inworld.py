@@ -73,7 +73,7 @@ class InworldProvider(TTSProvider):
             # Otherwise, if it matches a known voice id, select that voice explicitly
             elif mid.lower() in voice_map:
                 selected_voice_id = voice_map[mid.lower()]["voiceId"]
-
+        print("Running with Inworld TTS, model_id: ", model_id)
         payload = {
             "text": text,
             "voiceId": selected_voice_id,
