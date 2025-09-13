@@ -79,6 +79,7 @@ class VeenaProvider(TTSProvider):
                         "speaker_id": model_id,
                         "streaming": False,
                         "normalize": True,
+                        "skip_text_validation": True,
                     },
                     headers={
                         "Content-Type": "application/json",
