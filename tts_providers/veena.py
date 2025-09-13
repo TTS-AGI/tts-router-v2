@@ -1,6 +1,7 @@
 import os
 import base64
 import httpx
+import random
 from loguru import logger
 from typing import Dict, List, Tuple, Any
 from .provider import TTSProvider
@@ -61,13 +62,6 @@ class VeenaProvider(TTSProvider):
         if not cls.is_available():
             raise ValueError("Maya Research Veena TTS provider is not available")
 
-        # Use default speaker if no model specified
-        if not model_id:
-            model_id = cls._speakers[0]  # Default to first speaker
-            logger.info(f"No model specified for Veena TTS, using default speaker: {model_id}")
-        else:
-            logger.info(f"Using specified model for Veena TTS: {model_id}")
-
         try:
             endpoint = f"{cls._base_url}/generate"
 
@@ -76,7 +70,7 @@ class VeenaProvider(TTSProvider):
                     endpoint,
                     json={
                         "text": text,
-                        "speaker_id": model_id,
+                        "speaker_id": random.choice(cls._speakers) ,
                         "streaming": False,
                         "normalize": True,
                         "skip_text_validation": True,
