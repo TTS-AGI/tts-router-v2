@@ -12,7 +12,7 @@ from .base import register_provider
 class VeenaProvider(TTSProvider):
     _models = None
     _api_key = None
-    _base_url = "https://api.mayaresearch.ai"
+    _base_url = "https://flash.mayaresearch.ai"
 
     # Available Veena speakers based on Maya Research documentation
     _speakers = [
