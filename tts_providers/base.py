@@ -63,6 +63,7 @@ _provider_modules = [
     ("hume", "Hume"),
     ("papla", "Papla"),
     ("kokoro", "Kokoro"),
+    ("magpie", "Magpie"),
     ("cartesia", "Cartesia"),
     ("spark", "Spark-TTS"),
     ("megatts3", "MegaTTS3"),
