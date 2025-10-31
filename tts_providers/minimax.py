@@ -42,24 +42,34 @@ class MinimaxProvider(TTSProvider):
         # Set up available models
         cls._models = [
             {
-                "id": "speech-02-hd",
+                "id": "speech-2.6-hd",
+                "name": "Hailuo Speech 2.6 HD",
+                "description": "Ultra-low latency, intelligence parsing, and enhanced naturalness",
+            },
+            {
+                "id": "speech-2.6-turbo",
+                "name": "Hailuo Speech 2.6 Turbo",
+                "description": "Faster, more affordable, and ideal for your agent",
+            },
+            {
+                "id": "speech-2.6-hd",
                 "name": "Hailuo Speech 02 HD",
-                "description": "Minimax's TTS model",
+                "description": "Superior rhythm and stability, with outstanding performance in replication similarity and sound quality",
             },
             {
                 "id": "speech-02-turbo",
                 "name": "Hailuo Speech 02 Turbo",
-                "description": "Minimax's TTS model",
+                "description": "Superior rhythm and stability, with enhanced multilingual capabilities and excellent performance",
             },
             {
                 "id": "speech-01-hd",
                 "name": "Hailuo Speech 01 HD",
-                "description": "Minimax's TTS model",
+                "description": "Rich Voices, Expressive Emotions, Authentic Languages",
             },
             {
                 "id": "speech-01-turbo",
                 "name": "Hailuo Speech 01 Turbo",
-                "description": "Minimax's TTS model",
+                "description": "Excellent performance and low latency",
             },
         ]
 
@@ -79,7 +89,7 @@ class MinimaxProvider(TTSProvider):
 
         # Default model if none specified
         if not model_id:
-            model_id = "speech-02-hd"
+            model_id = "speech-2.6-hd"
             logger.info(f"No model specified for Minimax, using default: {model_id}")
 
         # Select a random voice
