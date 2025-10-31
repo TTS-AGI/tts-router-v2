@@ -76,6 +76,7 @@ _provider_modules = [
     ("wordcab", "Wordcab"),
     ("veena", "Maya Research Veena"),
     ("maya1", "Maya Research Maya-1"),
+    ("parmesan", "Parmesan"),
 ]
 
 for module_name, pretty_name in _provider_modules:

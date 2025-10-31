@@ -1,7 +1,5 @@
 import os
-import base64
 import httpx
-import numpy as np
 from loguru import logger
 from typing import Dict, List, Tuple, Any
 
@@ -20,18 +18,14 @@ PARMESAN_VOICES = [
 @register_provider("parmesan")
 class ParmesanProvider(TTSProvider):
     _api_key = None
-    _base_url = os.getenv("PARMESAN_BASE_URL")
-
-    if not cls._base_url:
-        logger.error("Parmesan base URL not found in environment variables")
-        raise ValueError("PARMESAN_BASE_URL environment variable is required")
-
+    _base_url = None
     _models = None
 
     @classmethod
     def _initialize_provider(cls):
         """Initialize the Parmesan provider"""
         cls._api_key = os.getenv("PARMESAN_API_KEY")
+        cls._base_url = os.getenv("PARMESAN_BASE_URL", "https://api.phonic.co/v1/tts")
 
         if not cls._api_key:
             logger.error("Parmesan API key not found in environment variables")
@@ -107,15 +101,10 @@ class ParmesanProvider(TTSProvider):
                 # The audio is already base64 encoded
                 audio_b64 = response_data["audio"]
 
-                # Since the output is PCM, we need to convert it to a standard format
-                # Decode the base64 to get raw PCM bytes
-                audio_bytes = base64.b64decode(audio_b64)
-
-                # Convert PCM to numpy array
-                audio_np = np.frombuffer(audio_bytes, dtype=np.int16)
-
-                # For now, we'll return the raw PCM data as base64
-                # In a production system, you might want to convert this to WAV or another format
+                # Return the raw PCM data as base64
+                # The API returns PCM format which can be decoded with:
+                # audio_bytes = base64.b64decode(audio_b64)
+                # audio_np = np.frombuffer(audio_bytes, dtype=np.int16)
                 return audio_b64, "pcm"
 
             except Exception as e:
