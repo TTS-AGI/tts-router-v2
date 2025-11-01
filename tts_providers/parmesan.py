@@ -1,7 +1,11 @@
 import os
 import httpx
+import base64
+import io
+import wave
 from loguru import logger
 from typing import Dict, List, Tuple, Any
+import numpy as np
 
 from .provider import TTSProvider
 from .base import register_provider
@@ -98,14 +102,28 @@ class ParmesanProvider(TTSProvider):
                     )
                     raise Exception("Unexpected response format from Parmesan API")
 
-                # The audio is already base64 encoded
+                # The audio is base64 encoded PCM data
                 audio_b64 = response_data["audio"]
-
-                # Return the raw PCM data as base64
-                # The API returns PCM format which can be decoded with:
-                # audio_bytes = base64.b64decode(audio_b64)
-                # audio_np = np.frombuffer(audio_bytes, dtype=np.int16)
-                return audio_b64, "pcm"
+                
+                # Decode base64 to bytes
+                audio_bytes = base64.b64decode(audio_b64)
+                
+                # Convert bytes to numpy array
+                audio_np = np.frombuffer(audio_bytes, dtype=np.int16)
+                
+                # Convert PCM to WAV format
+                wav_buffer = io.BytesIO()
+                with wave.open(wav_buffer, 'wb') as wav_file:
+                    wav_file.setnchannels(1)  # Mono
+                    wav_file.setsampwidth(2)  # 16-bit
+                    wav_file.setframerate(44100)  # 44.1kHz
+                    wav_file.writeframes(audio_np.tobytes())
+                
+                # Get WAV data and encode to base64
+                wav_data = wav_buffer.getvalue()
+                wav_b64 = base64.b64encode(wav_data).decode('utf-8')
+                
+                return wav_b64, "wav"
 
             except Exception as e:
                 logger.error(f"Error in Parmesan synthesis: {str(e)}")
