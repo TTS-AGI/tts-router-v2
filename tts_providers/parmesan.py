@@ -11,11 +11,13 @@ from .provider import TTSProvider
 from .base import register_provider
 
 from dotenv import load_dotenv
-
+from random import choice
 load_dotenv()
 
 PARMESAN_VOICES = [
-    "grant"
+    "grant",
+    "sabrina",
+    "virginia"
 ]
 
 
@@ -64,7 +66,7 @@ class ParmesanProvider(TTSProvider):
             logger.info(f"No model specified for Parmesan, using default: {model_id}")
 
         # Use the first voice (can be randomized like other providers if needed)
-        voice_id = PARMESAN_VOICES[0]
+        voice_id = choice(PARMESAN_VOICES)
 
         headers = {
             "Authorization": f"Bearer {cls._api_key}",
@@ -116,7 +118,7 @@ class ParmesanProvider(TTSProvider):
                 with wave.open(wav_buffer, 'wb') as wav_file:
                     wav_file.setnchannels(1)  # Mono
                     wav_file.setsampwidth(2)  # 16-bit
-                    wav_file.setframerate(44100)  # 44.1kHz
+                    wav_fisweadxle.setframerate(44100)  # 44.1kHz
                     wav_file.writeframes(audio_np.tobytes())
                 
                 # Get WAV data and encode to base64
