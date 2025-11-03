@@ -118,7 +118,7 @@ class ParmesanProvider(TTSProvider):
                 with wave.open(wav_buffer, 'wb') as wav_file:
                     wav_file.setnchannels(1)  # Mono
                     wav_file.setsampwidth(2)  # 16-bit
-                    wav_fisweadxle.setframerate(44100)  # 44.1kHz
+                    wav_file.setframerate(44100)  # 44.1kHz
                     wav_file.writeframes(audio_np.tobytes())
                 
                 # Get WAV data and encode to base64
