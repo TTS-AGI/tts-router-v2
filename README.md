@@ -26,6 +26,8 @@ The router used in the upcoming new release of the TTS Arena.
    HF_TOKEN=your_huggingface_token # For Kokoro, CosyVoice spaces
    HUME_API_KEY=your_hume_api_key
    VEENA_API_KEY=your_veena_api_key # For Maya Research Veena TTS
+   VOCU_API_KEY=your_vocu_api_key # For Vocu TTS
+   PARMESAN_API_KEY=your_parmesan_api_key # For Parmesan TTS
    ZEROGPU_TOKENS=hf_xxx,hf_xxx
    ```
    (The `ZEROGPU_TOKENS` variable should be a comma-separated list of Hugging Face tokens for multiple Hugging Face accounts to avoid ZeroGPU rate limiting)
