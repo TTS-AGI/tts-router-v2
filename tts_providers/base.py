@@ -64,6 +64,7 @@ _provider_modules = [
     ("papla", "Papla"),
     ("kokoro", "Kokoro"),
     ("magpie", "Magpie"),
+    ("magpie_rp", "Magpie-RP"),
     ("cartesia", "Cartesia"),
     ("spark", "Spark-TTS"),
     ("megatts3", "MegaTTS3"),
