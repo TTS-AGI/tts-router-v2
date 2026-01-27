@@ -68,7 +68,7 @@ class InworldProvider(TTSProvider):
             mid = str(model_id).strip()
 
             # If the provided model_id is an engine selector, use it
-            if mid in {"inworld-tts-1", "inworld-tts-1-max"}:
+            if mid in {"inworld-tts-1", "inworld-tts-1-max", "inworld-tts-1.5-max"}:
                 engine_model_id = mid
             # Otherwise, if it matches a known voice id, select that voice explicitly
             elif mid.lower() in voice_map:
