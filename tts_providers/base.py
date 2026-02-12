@@ -80,6 +80,7 @@ _provider_modules = [
     ("parmesan", "Parmesan"),
     ("vocu", "Vocu"),
     ("neuphonic", "Neuphonic"),
+    ("mars", "MARS"),
 ]
 
 for module_name, pretty_name in _provider_modules:
