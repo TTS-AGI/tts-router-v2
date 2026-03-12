@@ -81,6 +81,7 @@ _provider_modules = [
     ("vocu", "Vocu"),
     ("neuphonic", "Neuphonic"),
     ("mars", "MARS"),
+    ("tontaube", "Tontaube"),
 ]
 
 for module_name, pretty_name in _provider_modules:
