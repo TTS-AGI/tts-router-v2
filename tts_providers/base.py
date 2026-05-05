@@ -61,6 +61,7 @@ _provider_modules = [
     ("cosyvoice", "CosyVoice"),
     ("styletts", "StyleTTS"),
     ("hume", "Hume"),
+    ("deepdub", "Deepdub"),
     ("papla", "Papla"),
     ("kokoro", "Kokoro"),
     ("magpie", "Magpie"),
