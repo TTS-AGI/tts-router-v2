@@ -13,3 +13,4 @@ soundfile
 httpx[http2]
 ffmpeg-python
 pydub
+deepdub
