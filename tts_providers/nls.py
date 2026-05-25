@@ -17,9 +17,9 @@ load_dotenv()
 @register_provider("nls")
 class NLSProvider(TTSProvider):
     _token = None
-    _base_url = os.getenv("NLS_BASE_URL")
+    _base_url = os.getenv("NLS_BASE_URL", "https://nls-gateway-singapore.aliyuncs.com")
     _models = None
-    _spk_list = None
+    _spk_lists = {}
 
     @classmethod
     def _initialize_provider(cls):
@@ -33,17 +33,27 @@ class NLSProvider(TTSProvider):
         cls._models = [
             {
                 "id": "tts-arena",
-                "name": "NLS TTS Arena",
-                "description": "NLS",
-            }
+                "name": "NLS Pre V1",
+                "description": "NLS pre-release TTS model",
+            },
+            {
+                "id": "tts-arena-1",
+                "name": "Luck Dolphin",
+                "description": "NLS Luck Dolphin pre-release TTS model",
+            },
+            {
+                "id": "tts-arena-2",
+                "name": "Luck Dolphin Turbo",
+                "description": "NLS Luck Dolphin Turbo pre-release TTS model",
+            },
         ]
         
         # Fetch available speakers
         try:
-            cls._fetch_speakers()
+            for model in cls._models:
+                cls._fetch_speakers(model["id"])
         except Exception as e:
             logger.error(f"Failed to fetch NLS speakers: {str(e)}")
-            cls._spk_list = []
 
     @classmethod
     def _make_http_header(cls):
@@ -54,7 +64,7 @@ class NLSProvider(TTSProvider):
         }
 
     @classmethod
-    def _fetch_speakers(cls):
+    def _fetch_speakers(cls, appkey: str):
         """Fetch available speakers from NLS API"""
         list_url = cls._base_url + '/rest/v1/general/TtsArenaGet'
         
@@ -62,19 +72,19 @@ class NLSProvider(TTSProvider):
             response = requests.post(
                 list_url, 
                 headers=cls._make_http_header(), 
-                params={'appkey': 'tts-arena', 'any_response': 'true'}
+                params={'appkey': appkey, 'any_response': 'true'}
             )
             
             if response.status_code == 200:
                 list_result = json.loads(response.json()['data'])
-                cls._spk_list = list_result.get('spk_list', [])
-                logger.info(f"Fetched {len(cls._spk_list)} NLS speakers")
+                cls._spk_lists[appkey] = list_result.get('spk_list', [])
+                logger.info(f"Fetched {len(cls._spk_lists[appkey])} NLS speakers for {appkey}")
             else:
-                logger.error(f"Failed to fetch NLS speakers: {response.status_code}")
-                cls._spk_list = []
+                logger.error(f"Failed to fetch NLS speakers for {appkey}: {response.status_code}")
+                cls._spk_lists[appkey] = []
         except Exception as e:
-            logger.error(f"Error fetching NLS speakers: {str(e)}")
-            cls._spk_list = []
+            logger.error(f"Error fetching NLS speakers for {appkey}: {str(e)}")
+            cls._spk_lists[appkey] = []
 
     @classmethod
     def get_available_models(cls) -> List[Dict[str, Any]]:
@@ -90,21 +100,28 @@ class NLSProvider(TTSProvider):
         if not cls.is_available():
             raise ValueError("NLS provider is not available")
 
-        # Default model is the only model
         if not model_id:
             model_id = "tts-arena"
             logger.info(f"No model specified for NLS, using default: {model_id}")
 
+        valid_model_ids = {model["id"] for model in cls._models}
+        if model_id == "nls-1":
+            model_id = "tts-arena"
+        if model_id not in valid_model_ids:
+            available_models = ", ".join(valid_model_ids)
+            logger.error(f"NLS model {model_id} not found. Available models: {available_models}")
+            raise ValueError(f"Model {model_id} not found for NLS provider")
+
         # Select a random speaker if available
-        if not cls._spk_list:
+        if not cls._spk_lists.get(model_id):
             logger.warning("No speakers available, attempting to fetch speakers")
-            cls._fetch_speakers()
+            cls._fetch_speakers(model_id)
         
-        if not cls._spk_list:
+        if not cls._spk_lists.get(model_id):
             raise ValueError("No speakers available for NLS synthesis")
 
-        spk_id = random.choice(cls._spk_list)
-        logger.info(f"Using NLS speaker: {spk_id}")
+        spk_id = random.choice(cls._spk_lists[model_id])
+        logger.info(f"Using NLS model {model_id} speaker: {spk_id}")
 
         synthesis_url = cls._base_url + '/rest/v1/general/TtsArenaInfer'
         data = {
@@ -117,7 +134,7 @@ class NLSProvider(TTSProvider):
                 synthesis_url, 
                 headers=cls._make_http_header(), 
                 data=json.dumps(data),
-                params={'appkey': 'tts-arena', 'any_response': 'true'},
+                params={'appkey': model_id, 'any_response': 'true'},
                 timeout=30.0
             )
 

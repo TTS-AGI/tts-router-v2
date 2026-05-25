@@ -4,7 +4,7 @@ The router used in the upcoming new release of the TTS Arena.
 
 ## Features
 
-- Support for multiple TTS providers (ElevenLabs, PlayHT, Papla, CosyVoice, Hume, Deepdub, Kokoro, Maya Research Veena)
+- Support for multiple TTS providers (ElevenLabs, PlayHT, Papla, CosyVoice, Hume, Deepdub, Gradium, Typecast, Kokoro, Maya Research Veena)
 - RESTful API with FastAPI
 - Provider and model selection
 - Default voice selection
@@ -26,6 +26,10 @@ The router used in the upcoming new release of the TTS Arena.
    HF_TOKEN=your_huggingface_token # For Kokoro, CosyVoice spaces
    HUME_API_KEY=your_hume_api_key
    DEEPDUB_API_KEY=your_deepdub_api_key
+   GRADIUM_API_KEY=your_gradium_api_key
+   TYPECAST_API_KEY=your_typecast_api_key
+   NLS_TOKEN=your_nls_token
+   NLS_BASE_URL=https://nls-gateway-singapore.aliyuncs.com
    VEENA_API_KEY=your_veena_api_key # For Maya Research Veena TTS
    VOCU_API_KEY=your_vocu_api_key # For Vocu TTS
    PARMESAN_API_KEY=your_parmesan_api_key # For Parmesan TTS
