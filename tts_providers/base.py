@@ -62,6 +62,8 @@ _provider_modules = [
     ("styletts", "StyleTTS"),
     ("hume", "Hume"),
     ("deepdub", "Deepdub"),
+    ("gradium", "Gradium"),
+    ("typecast", "Typecast"),
     ("papla", "Papla"),
     ("kokoro", "Kokoro"),
     ("magpie", "Magpie"),
