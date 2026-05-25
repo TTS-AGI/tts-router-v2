@@ -40,7 +40,7 @@ class GradiumProvider(TTSProvider):
         cls._models = [
             {
                 "id": "gradium",
-                "name": "Gradium",
+                "name": "Gradium TTS",
                 "description": "Gradium TTS model with randomized recommended voices",
             }
         ]

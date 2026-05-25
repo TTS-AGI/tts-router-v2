@@ -43,7 +43,7 @@ class TypecastProvider(TTSProvider):
         cls._models = [
             {
                 "id": "typecast",
-                "name": "Typecast",
+                "name": "Typecast SSFM 3.0",
                 "description": f"Typecast {cls._model_name} model with randomized recommended voices",
             }
         ]
