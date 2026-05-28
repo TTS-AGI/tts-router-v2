@@ -99,9 +99,10 @@ class InworldProvider(TTSProvider):
             if "audioContent" not in response_data:
                 raise Exception("No audioContent in response")
             
-            # The audioContent is already base64 encoded, so just return it
             audio_data = response_data["audioContent"]
-            return audio_data, "wav"
+            audio_bytes = base64.b64decode(audio_data)
+            extension = "mp3" if audio_bytes.startswith(b"ID3") else "wav"
+            return audio_data, extension
 
         except httpx.HTTPStatusError as e:
             logger.error(f"HTTP error in Inworld TTS synthesis: {str(e)}, content: {e.response.text}")
