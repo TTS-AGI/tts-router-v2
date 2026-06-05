@@ -1,3 +1,6 @@
+> [!IMPORTANT]  
+> This repository is now archived, it was used in [TTS Arena v2](https://github.com/TTS-AGI/TTS-Arena/tree/v2). Going forward, TTS providers are added as plugins directly to the [TTS Arena repository](https://github.com/TTS-AGI/TTS-Arena). To add your model, please review documentation in that repository.
+
 # TTS Router V2
 
 The router used in the upcoming new release of the TTS Arena.
